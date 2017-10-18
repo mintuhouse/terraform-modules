@@ -42,7 +42,7 @@ resource "aws_route53_record" "A-NS" {
   zone_id    = "${aws_route53_zone.primary.zone_id}"
   name       = "${local.name_servers[count.index]}"
   type       = "A"
-  ttl        = "${var.ttl}" # Original: 300
+  ttl        = "${var.ttl ? var.ttl : 300}"
   records    = ["${element(data.external.dns.*.result.ipv4, count.index)}"]
   depends_on = ["data.external.dns"]
 }
@@ -52,7 +52,7 @@ resource "aws_route53_record" "AAAA-NS" {
   zone_id    = "${aws_route53_zone.primary.zone_id}"
   name       = "${local.name_servers[count.index]}"
   type       = "AAAA"
-  ttl        = "${var.ttl}" # Original: 300
+  ttl        = "${var.ttl ? var.ttl : 300}"
   records    = ["${element(data.external.dns.*.result.ipv6, count.index)}"]
   depends_on = ["data.external.dns"]
 }
@@ -61,7 +61,7 @@ resource "aws_route53_record" "primary_ns" {
   zone_id = "${aws_route53_zone.primary.zone_id}"
   name    = "${var.domain}"
   type    = "NS"
-  ttl     = "${var.ttl}" # Original: 172800
+  ttl     = "${var.ttl ? var.ttl : 172800}"
   records = ["${local.name_servers}"]
 }
 
@@ -69,6 +69,6 @@ resource "aws_route53_record" "primary_soa" {
   zone_id = "${aws_route53_zone.primary.zone_id}"
   name    = "${var.domain}"
   type    = "SOA"
-  ttl     = "${var.ttl}" # Original: 900
-  records = ["${local.primary_name_server} hostmaster.${var.domain}. 1 7200 900 1209600 ${var.ttl}"] # Original TTL: 86400
+  ttl     = "${var.ttl ? var.ttl : 900}"
+  records = ["${local.primary_name_server} hostmaster.${var.domain}. 1 7200 900 1209600 ${var.ttl ? var.ttl : 86400}"]
 }

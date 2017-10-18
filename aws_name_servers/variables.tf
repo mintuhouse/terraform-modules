@@ -3,8 +3,8 @@ variable "domain" {
 }
 
 variable "ttl" {
-  description = "Time-To-Live of DNS Records"
-  default     = "3600"
+  description = "Time-To-Live of DNS Records in seconds"
+  default     = false
 }
 
 variable "whitelabel" {
