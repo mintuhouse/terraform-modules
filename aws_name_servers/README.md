@@ -1,0 +1,11 @@
+# Usage
+* If `var.whitelabel` is set as `"true"`, you also need to [add glue records to your registrar](#modifying-glue-records)
+
+### Modifying Glue Records
+Refer the documentation for your registrar
+* [AWS](https://docs.aws.amazon.com/Route53/latest/DeveloperGuide/domain-name-servers-glue-records.html)
+* [GoDaddy](https://in.godaddy.com/help/add-my-own-host-names-as-nameservers-12320)
+
+Add both IPv4 and IPv6 address
+
+**WARNING**: Don't make a mistake in assigning wrong IPs. Since the default TTL is 1 hour, it may be a while for which your site would be unavailable. A better approach would be to set the ttl to 60s initially and increase it after you confirm that everything is working normally
