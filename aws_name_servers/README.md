@@ -1,5 +1,6 @@
 # Usage
 * If `var.whitelabel` is set as `"true"`, you also need to [add glue records to your registrar](#modifying-glue-records)
+* Note: There is a minor bug with the current implementation sometimes. If you get an error, run the module with whitelabel=false and then change to true.
 
 ### Modifying Glue Records
 Refer the documentation for your registrar
