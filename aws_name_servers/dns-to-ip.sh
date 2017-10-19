@@ -14,4 +14,4 @@ IPv6=$(dig AAAA $DNSNAME +short)
 
 # Safely produce a JSON object containing the result value.
 # jq will ensure that the value is properly quoted and escaped to produce a valid JSON string.
-jq -n --arg ipv4 "$IPv4" --arg ipv6 "$IPv6" --arg NS "$NS" '{"ns":$NS, "ipv4":$ipv4, "ipv6":$ipv6}'
+jq -n --arg ipv4 "$IPv4" --arg ipv6 "$IPv6" --arg NS "$NS" --arg dnsname "$DNSNAME" '{"ns":$NS, "dnsname":$dnsname, "ipv4":$ipv4, "ipv6":$ipv6}'
