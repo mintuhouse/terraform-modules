@@ -66,3 +66,10 @@ resource "aws_route53_record" "primary_amazonses_mail_from_spf_record" {
   ttl      = "600"
   records  = ["v=spf1 include:amazonses.com -all"]
 }
+
+# module "email_report" {
+#   source          = "../aws_email_reports"
+#   region          = "${var.region}"
+#   domain          = "${var.domain}"
+#   reporting_email = "astarcrm@gmail.com"
+# }
