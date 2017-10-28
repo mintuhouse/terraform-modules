@@ -7,35 +7,27 @@ locals {
 resource "aws_route53_zone" "primary" {
   name              = "${var.domain}"
   delegation_set_id = "${var.route53_delegation_set_id}"
-}
 
-data "null_data_source" "name_servers" {
-  count = "${local.wcount}"
-
-  inputs = {
-    value = "ns${count.index+1}.${local.whitelabel_domain}"
+  lifecycle {
+    prevent_destroy = true
   }
 }
 
 locals {
   delegated_name_servers = "${sort(aws_route53_zone.primary.name_servers)}"
+  ns_name_servers        = "${formatlist("ns%s.%s", list("1","2","3","4"), local.whitelabel_domain)}"
 
   name_servers = ["${split(",", (var.whitelabel == "true") ?
-          join(",", data.null_data_source.name_servers.*.outputs.value) :
+          join(",", local.ns_name_servers) :
           join(",", local.delegated_name_servers))}"]
 
   primary_name_server = "${element(local.name_servers, 0)}"
 }
 
 # Get IPv4 & IPv6 addresses of name servers from delegation set
-data "external" "dns" {
-  count   = "${local.wcount}"
-  program = ["bash", "${path.module}/dns-to-ip.sh"]
-
-  query = {
-    dnsname = "${local.delegated_name_servers[count.index]}"
-    nsname  = "${local.name_servers[count.index]}"
-  }
+data "utils_resolve_ip" "dns" {
+  count    = "${local.wcount}"
+  dns_name = "${local.delegated_name_servers[count.index]}"
 }
 
 resource "aws_route53_record" "A-NS" {
@@ -44,7 +36,7 @@ resource "aws_route53_record" "A-NS" {
   name    = "${local.name_servers[count.index]}"
   type    = "A"
   ttl     = "${var.ttl ? var.ttl : 300}"
-  records = ["${element(data.external.dns.*.result.ipv4, count.index)}"]
+  records = ["${element(data.utils_resolve_ip.dns.*.ipv4, count.index)}"]
 }
 
 resource "aws_route53_record" "AAAA-NS" {
@@ -53,7 +45,7 @@ resource "aws_route53_record" "AAAA-NS" {
   name    = "${local.name_servers[count.index]}"
   type    = "AAAA"
   ttl     = "${var.ttl ? var.ttl : 300}"
-  records = ["${element(data.external.dns.*.result.ipv6, count.index)}"]
+  records = ["${element(data.utils_resolve_ip.dns.*.ipv6, count.index)}"]
 }
 
 resource "aws_route53_record" "primary_ns" {
